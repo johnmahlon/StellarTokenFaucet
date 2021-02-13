@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "express": "^4.17.1",
+    "stellar-sdk": "^8.0.0"
+  },
+  "name": "schrutebuckfaucet",
+  "description": "SchruteBuck faucet for easy distribution of SchruteBuck tokens on Stellar network.",
+  "version": "0.0.1",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnmahlon/SchruteBuckFaucet.git"
+  },
+  "author": "John Peden",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnmahlon/SchruteBuckFaucet/issues"
+  },
+  "homepage": "https://github.com/johnmahlon/SchruteBuckFaucet#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
