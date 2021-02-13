@@ -29,50 +29,41 @@ app.post('/send', async (req, res) => {
         return;
     }
 
-    stellarServer.loadAccount(
-        distributorId,
-    ).then((account) => {
-        var transaction = new TransactionBuilder(
+    var account = await stellarServer.loadAccount(distributorId)
+
+    var transaction = new TransactionBuilder(
             account, 
             { 
                 fee: "100", 
                 networkPassphrase: Networks.TESTNET
             }
-        )
-        .addOperation(Operation.payment({
-            destination: toAddress,
-            asset: asset,
-            amount: "1"
-        }))
-        .setTimeout(30)
-        .build();
+    )
+    .addOperation(Operation.payment({
+        destination: toAddress,
+        asset: asset,
+        amount: "1"
+    }))
+    .setTimeout(30)
+    .build();
 
-        var pair = Stellar.Keypair.fromSecret(distributorPrivate);
-        transaction.sign(pair);
+    var pair = Stellar.Keypair.fromSecret(distributorPrivate);
+    transaction.sign(pair);
 
-        stellarServer
-            .submitTransaction(
-                transaction,
-                {
-                    skipMemoRequiredCheck: true
-                }
-            )
-            .then(
-                result => {
-                    console.log(result)
-                },
-
-                reject => {
-                    console.log(reject);
-                }
-            )
-            .catch((err) => { console.log(err) });
-        
-
+    try {
+        const result = await stellarServer.submitTransaction(
+            transaction,
+            {
+                skipMemoRequiredCheck: true
+            }
+        );
+        console.log(result)
         addressHistory.push(req.body.address);
         res.send(`${amountToSend} SchruteBuck token sent to ${toAddress}!`);
-    })
-    .catch( (err) => console.log(err));
+
+    } catch (err) {
+        console.log(err)
+        res.send("Error sending transaction :(");
+    }
 });
 
 app.listen(port, () => {
