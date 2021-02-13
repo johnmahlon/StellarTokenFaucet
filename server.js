@@ -6,17 +6,11 @@ const { TransactionBuilder, Asset, Keypair, Networks, Operation } = require("ste
 const app = express();
 const port = 3000; 
 
-var distributorId;
-var distributorPrivate;
-var issuerId;
+var config;
 var asset;
-
-const amountToSend = 1;
+var stellarServer;
 
 addressHistory = [];
-
-stellarServer = new Stellar.Server("https://horizon-testnet.stellar.org");
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -29,24 +23,25 @@ app.post('/send', async (req, res) => {
         return;
     }
 
-    var account = await stellarServer.loadAccount(distributorId)
+    var account = await stellarServer.loadAccount(config.distributor.public)
+    var fee = await stellarServer.fetchBaseFee();
 
     var transaction = new TransactionBuilder(
             account, 
             { 
-                fee: "100", 
+                fee, 
                 networkPassphrase: Networks.TESTNET
             }
     )
     .addOperation(Operation.payment({
         destination: toAddress,
         asset: asset,
-        amount: "1"
+        amount: config.amountToSend
     }))
     .setTimeout(30)
     .build();
 
-    var pair = Stellar.Keypair.fromSecret(distributorPrivate);
+    var pair = Stellar.Keypair.fromSecret(config.distributor.private);
     transaction.sign(pair);
 
     try {
@@ -58,7 +53,7 @@ app.post('/send', async (req, res) => {
         );
         console.log(result)
         addressHistory.push(req.body.address);
-        res.send(`${amountToSend} SchruteBuck token sent to ${toAddress}!`);
+        res.send(`${config.amountToSend} SchruteBuck token sent to ${toAddress}!`);
 
     } catch (err) {
         console.log(err)
@@ -73,11 +68,9 @@ app.listen(port, () => {
 
 function parseFile(name) {
     var fs = require('fs');
-    var data = JSON.parse(fs.readFileSync(name, 'utf8'));
+    config = JSON.parse(fs.readFileSync(name, 'utf8'));
 
-    distributorId = data.distributor.public;
-    distributorPrivate = data.distributor.private;
-
-    asset = new Asset(data.asset.name, data.asset.issuer);
+    asset = new Asset(config.asset.name, config.asset.issuer);
+    stellarServer = new Stellar.Server(config.endpoint);
 }
 
