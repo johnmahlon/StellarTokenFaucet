@@ -16,7 +16,7 @@ You will need to provide a json file in the format:
         "private": "<Distributor private key"
     },
 
-    "endpoint": "https://horizon-testnet.stellar.org",
+    "public": <true or false>,
 
     "amountToSend": "100"
 }
