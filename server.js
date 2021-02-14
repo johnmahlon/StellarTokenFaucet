@@ -9,6 +9,7 @@ const port = 3000;
 var config;
 var asset;
 var stellarServer;
+var stellarPassphrase;
 
 addressHistory = [];
 
@@ -53,7 +54,7 @@ app.post('/', async (req, res) => {
         );
         console.log(result)
         addressHistory.push(req.body.address);
-        res.send(`${config.amountToSend} SchruteBuck token sent to ${toAddress}!`);
+        res.send(`${config.amountToSend} ${config.asset.name} tokens sent to ${toAddress}!`);
 
     } catch (err) {
         console.log(err)
@@ -62,7 +63,7 @@ app.post('/', async (req, res) => {
 });
 
 app.listen(port, () => {
-    parseFile("TEST.json");
+    parseFile("PUBLIC.json");
     console.log(`Listening on port ${3000}`);
 });
 
@@ -71,6 +72,13 @@ function parseFile(name) {
     config = JSON.parse(fs.readFileSync(name, 'utf8'));
 
     asset = new Asset(config.asset.name, config.asset.issuer);
-    stellarServer = new Stellar.Server(config.endpoint);
+
+    stellarServer = new Stellar.Server(
+        config.public ? 
+            "https://horizon.stellar.org" 
+            : "https://horizon-testnet.stellar.org"
+        );
+
+    stellarPassphrase = config.public ? Networks.PUBLIC : Networks.TESTNET;
 }
 
