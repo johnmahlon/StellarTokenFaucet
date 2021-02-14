@@ -19,6 +19,11 @@ app.post('/', async (req, res) => {
     var toAddress = req.body.address;
     console.log('received: ' + toAddress);
 
+    if (addressHistory.length >= config.totalTx) {
+        res.send("All 100 transactions have been sent :(");
+        return;
+    }
+
     if (addressHistory.includes(toAddress)) {
         res.send("Sorry, you've already gotten it :(");
         return;
