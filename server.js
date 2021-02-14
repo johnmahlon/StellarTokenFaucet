@@ -27,20 +27,25 @@ app.post('/', async (req, res) => {
     var account = await stellarServer.loadAccount(config.distributor.public)
     var fee = await stellarServer.fetchBaseFee();
 
-    var transaction = new TransactionBuilder(
+    try {
+        var transaction = new TransactionBuilder(
             account, 
             { 
                 fee, 
                 networkPassphrase: stellarPassphrase
             }
-    )
-    .addOperation(Operation.payment({
-        destination: toAddress,
-        asset: asset,
-        amount: config.amountToSend
-    }))
-    .setTimeout(30)
-    .build();
+        )
+        .addOperation(Operation.payment({
+            destination: toAddress,
+            asset: asset,
+            amount: config.amountToSend
+        }))
+        .setTimeout(30)
+        .build();
+    } catch(error) {
+        console.log(error);
+        res.send("Error with transaction, please email me at john+schrute@johnmahlon.me");
+    }
 
     var pair = Stellar.Keypair.fromSecret(config.distributor.private);
     transaction.sign(pair);
