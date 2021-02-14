@@ -31,7 +31,7 @@ app.post('/', async (req, res) => {
             account, 
             { 
                 fee, 
-                networkPassphrase: Networks.TESTNET
+                networkPassphrase: stellarPassphrase
             }
     )
     .addOperation(Operation.payment({
@@ -57,7 +57,8 @@ app.post('/', async (req, res) => {
         res.send(`${config.amountToSend} ${config.asset.name} tokens sent to ${toAddress}!`);
 
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        console.log(err.response.data.extras.result_codes);
         res.send("Error sending transaction :(");
     }
 });
