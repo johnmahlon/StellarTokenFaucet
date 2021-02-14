@@ -14,7 +14,7 @@ addressHistory = [];
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/send', async (req, res) => {
+app.post('/', async (req, res) => {
     var toAddress = req.body.address;
     console.log('received: ' + toAddress);
 
